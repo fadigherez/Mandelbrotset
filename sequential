@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define WIDTH 800
+#define HEIGHT 800
+#define MAX_ITER 1000
+#define X_MIN -2.0
+#define X_MAX 2.0
+#define Y_MIN -2.0
+#define Y_MAX 2.0
+
+int main() {
+    int pixels[WIDTH * HEIGHT];
+    double dx = (X_MAX - X_MIN) / WIDTH;
+    double dy = (Y_MAX - Y_MIN) / HEIGHT;
+    double x, y, x1, y1, x2, y2;
+    int i, j, k;
+
+    for (j = 0; j < HEIGHT; j++) {
+        for (i = 0; i < WIDTH; i++) {
+            x = X_MIN + i * dx;
+            y = Y_MIN + j * dy;
+            x1 = x;
+            y1 = y;
+            k = 0;
+
+            do {
+                x2 = x1 * x1 - y1 * y1 + x;
+                y2 = 2 * x1 * y1 + y;
+                x1 = x2;
+                y1 = y2;
+                k++;
+            } while (x1 * x1 + y1 * y1 < 4 && k < MAX_ITER);
+
+            if (k == MAX_ITER) {
+                pixels[j * WIDTH + i] = 0; // Black pixel
+            } else {
+                pixels[j * WIDTH + i] = 255; // White pixel
+            }
+        }
+    }
+
+    FILE *fp = fopen("mandelbrot.ppm", "wb");
+    fprintf(fp, "P6\n%d %d\n255\n", WIDTH, HEIGHT);
+
+    for (i = 0; i < WIDTH * HEIGHT; i++) {
+        fputc(pixels[i], fp); // Red pixel
+        fputc(pixels[i], fp); // Green pixel
+        fputc(pixels[i], fp); // Blue pixel
+    }
+
+    fclose(fp);
+
+    return 0;
+}
